@@ -22,11 +22,14 @@
       this.flipperLeft = this.createFlipperLeft();
       this.flipperRight = this.createFlipperRight();
       this.ball = this.createBall();
+      this.plunger = this.createPlunger();
     };
 
     PinballPhysics.prototype.registerKeys = function() {
       this.leftKey = this.game.input.keyboard.addKey(Phaser.Keyboard.Z);
       this.rightKey = this.game.input.keyboard.addKey(Phaser.Keyboard.X);
+      this.plungerKey = this.game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
+      this.plungerKey.onUp.add(this.launchPlunger, this);
     };
 
     PinballPhysics.prototype.checkBallOutOfBounds = function(body, shapeA, shapeB, equation) {
@@ -55,6 +58,14 @@
         this.flipperRightRevolute.lowerLimit = 0 * Math.PI / 180;
         this.flipperRightRevolute.upperLimit = 0 * Math.PI / 180;
       }
+      if (this.plungerKey.isDown) {
+          this.plunger.body.moveDown(100);
+      }
+    };
+
+    PinballPhysics.prototype.launchPlunger = function() {
+      var amount = Math.min(Math.abs((this.plunger.position.y - this.plungerAnchor.position.y) / 30), 1);
+      this.plunger.body.thrust(150000*amount);
     };
 
     PinballPhysics.prototype.createFlipperRevolute = function(sprite, pivotA, pivotB, motorSpeed) {
@@ -68,11 +79,42 @@
       return revolute;
     };
 
+    PinballPhysics.prototype.createPlunger = function() {
+      var plungerAnchor = this.create(735, 750, null);
+      plungerAnchor.key = 'plungerAnchor';
+      this.game.physics.p2.enableBody(plungerAnchor, true);
+      plungerAnchor.body.clearShapes();
+      plungerAnchor.body.setRectangle(55, 10);
+      plungerAnchor.body.static = true;
+      plungerAnchor.body.data.shapes[0].sensor = true;
+      plungerAnchor.body.clearCollision(true,true);
+      this.plungerAnchor = plungerAnchor;
+
+      var plunger = this.create(735, 860, null);
+      plunger.key = 'plunger';
+      this.game.physics.p2.enableBody(plunger, true);
+      plunger.body.clearShapes();
+      plunger.body.setRectangle(15, 55);
+      plunger.body.force = 500000;
+      plunger.body.gravity = 0;
+
+      this.game.physics.p2.createSpring(plungerAnchor, plunger, 100, 50, 1);
+      //ADD CONSTRAINT
+      //PrismaticConstraint(world, bodyA, bodyB, lockRotation, anchorA, anchorB, axis, maxForce)
+      constraint = this.game.physics.p2.createPrismaticConstraint(plungerAnchor,plunger,true,[0,0],[0,0],[0,1]);
+      //SET LIIMITS
+      constraint.lowerLimitEnabled=constraint.upperLimitEnabled = true;
+      constraint.upperLimit = -5;
+      constraint.lowerLimit = -10;
+      return plunger;
+    };
+
     PinballPhysics.prototype.createEndOfTable = function() {
       var endOfTable;
       endOfTable = this.create(this.game.world.width/2, this.game.world.height, null);
       endOfTable.key = 'endOfTable';
       this.game.physics.p2.enableBody(endOfTable, true);
+      endOfTable.body.clearShapes();
       endOfTable.body.static = true;
       endOfTable.body.setRectangle(this.game.world.width, 50);
       endOfTable.body.data.shapes[0].sensor = true;
@@ -91,7 +133,7 @@
 
     PinballPhysics.prototype.createBall = function() {
       var ball;
-      ball = this.create(250, 250, 'ball');
+      ball = this.create(735, 800, 'ball');
       this.game.physics.p2.enableBody(ball);
       ball.body.setCircle(20);
       ball.body.onBeginContact.add(this.checkBallOutOfBounds, this);
