@@ -11,6 +11,10 @@
       this.registerKeys();
       this.build();
       this.totalBalls = 5;
+      this.ballMaterial = this.game.physics.p2.createMaterial('ballMaterial');
+      this.bumperMaterial = this.game.physics.p2.createMaterial('bumperMaterial');
+      this.flipperMaterial = this.game.physics.p2.createMaterial('flipperMaterial');
+      this.plungerMaterial = this.game.physics.p2.createMaterial('plungerMaterial');
     }
 
     PinballPhysics.prototype.build = function() {
@@ -23,6 +27,10 @@
       this.flipperRight = this.createFlipperRight();
       this.ball = this.createBall();
       this.plunger = this.createPlunger();
+
+      this.generateContactMaterial(this.flipperMaterial, this.ballMaterial, 0); // BALL_FLIPPER
+      this.generateContactMaterial(this.plungerMaterial, this.ballMaterial, 1); // BALL_PLUNGER
+      this.generateContactMaterial(this.bumperMaterial, this.ballMaterial, 2); // BALL_BUMPER
     };
 
     PinballPhysics.prototype.registerKeys = function() {
@@ -63,9 +71,38 @@
       }
     };
 
+
+    PinballPhysics.prototype.generateContactMaterial = function (mat1, mat2, type) {
+      var contactMaterial = this.game.physics.p2.createContactMaterial(mat1, mat2);
+      contactMaterial.friction = 0;
+      contactMaterial.restitution = 0.5;
+      contactMaterial.stiffness = 1e7;
+      contactMaterial.relaxation = 3;
+      contactMaterial.frictionStiffness = 1e7;
+      contactMaterial.frictionRelaxation = 3;
+      contactMaterial.surfaceVelocity = 1;
+
+      switch (type) {
+        case 0 /* BALL_FLIPPER */:
+          contactMaterial.restitution = 0.9;
+          break;
+        case 1 /* BALL_PLUNGER */:
+          contactMaterial.restitution = 5;
+          break;
+        case 2 /* BALL_BUMPER */:
+          contactMaterial.restitution = 1.5;
+          break;
+
+        default:
+            throw (this);
+      }
+
+      return contactMaterial;
+    };
+
     PinballPhysics.prototype.launchPlunger = function() {
       var amount = Math.min(Math.abs((this.plunger.position.y - this.plungerAnchor.position.y) / 30), 1);
-      this.plunger.body.thrust(150000*amount);
+      this.plunger.body.thrust(160000*amount);
     };
 
     PinballPhysics.prototype.createFlipperRevolute = function(sprite, pivotA, pivotB, motorSpeed) {
@@ -97,6 +134,7 @@
       plunger.body.setRectangle(15, 55);
       plunger.body.force = 500000;
       plunger.body.gravity = 0;
+      plunger.body.setMaterial(this.plungerMaterial);
 
       this.game.physics.p2.createSpring(plungerAnchor, plunger, 100, 50, 1);
       //ADD CONSTRAINT
@@ -137,6 +175,10 @@
       this.game.physics.p2.enableBody(ball);
       ball.body.setCircle(20);
       ball.body.onBeginContact.add(this.checkBallOutOfBounds, this);
+      ball.body.angularVelocity = 0;
+      ball.body.fixedRotation = false;
+      ball.body.setZeroDamping();
+      ball.body.setMaterial(this.ballMaterial);
       this.currentBall += 1;
       return ball;
     };
@@ -147,6 +189,7 @@
       this.game.physics.p2.enableBody(flipper);
       flipper.body.clearShapes();
       flipper.body.loadPolygon('pinball', 'flipper_left');
+      flipper.body.setMaterial(this.flipperMaterial);
       pivotA = [this.game.physics.p2.pxm(flipper.width / 2 - 30), this.game.physics.p2.pxm(10)];
       pivotB = [this.game.physics.p2.pxmi(210), this.game.physics.p2.pxmi(920)];
       this.flipperLeftRevolute = this.createFlipperRevolute(flipper, pivotA, pivotB, -20);
@@ -159,6 +202,7 @@
       this.game.physics.p2.enableBody(flipper);
       flipper.body.clearShapes();
       flipper.body.loadPolygon('pinball', 'flipper_right');
+      flipper.body.setMaterial(this.flipperMaterial);
       pivotA = [-this.game.physics.p2.pxm(flipper.width / 2 - 30), this.game.physics.p2.pxm(10)];
       pivotB = [this.game.physics.p2.pxmi(500), this.game.physics.p2.pxmi(920)];
       this.flipperRightRevolute = this.createFlipperRevolute(flipper, pivotA, pivotB, 20);
