@@ -15,7 +15,7 @@
 
     PinballPhysics.prototype.build = function() {
       this.totalBalls = 5;
-      this.bodyDebug = true;
+      //this.bodyDebug = true;
       this.currentBall = 0;
       this.groundBody = new p2.Body();
       this.physicsWorld.addBody(this.groundBody);
@@ -113,7 +113,7 @@
     };
 
     PinballPhysics.prototype.createBumper = function(x, y) {
-      var bumper = this.create(x, y, null);
+      var bumper = this.create(x, y, 'bumper');
       this.game.physics.p2.enableBody(bumper, this.bodyDebug);
       bumper.body.clearShapes();
       bumper.body.setCircle(40);
@@ -123,7 +123,7 @@
     }
 
     PinballPhysics.prototype.createPlunger = function() {
-      var plungerAnchor = this.create(735, 790, null);
+      var plungerAnchor = this.create(735, 810, null);
       plungerAnchor.key = 'plungerAnchor';
       this.game.physics.p2.enableBody(plungerAnchor, this.bodyDebug);
       plungerAnchor.body.clearShapes();
@@ -133,11 +133,11 @@
       plungerAnchor.body.clearCollision(true,true);
       this.plungerAnchor = plungerAnchor;
 
-      var plunger = this.create(735, 860, null);
+      var plunger = this.create(735, 860, 'plunger');
       plunger.key = 'plunger';
       this.game.physics.p2.enableBody(plunger, this.bodyDebug);
-      plunger.body.clearShapes();
-      plunger.body.setRectangle(15, 55);
+      //plunger.body.clearShapes();
+      //plunger.body.setRectangle(15, 55);
       plunger.body.force = 500000;
       plunger.body.gravity = 0;
 

@@ -18,6 +18,8 @@
       this.load.image('ball', 'assets/ball.png');
       this.load.image('flipperLeft', 'assets/flipper_left.png');
       this.load.image('flipperRight', 'assets/flipper_right.png');
+      this.load.image('bumper', 'assets/bumper.png');
+      this.load.image('plunger', 'assets/plunger.png');
       this.load.bitmapFont('minecraftia', 'assets/minecraftia.png', 'assets/minecraftia.xml');
     },
 
