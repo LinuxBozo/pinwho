@@ -13,8 +13,9 @@
 
     create: function () {
       this.physics.startSystem(Phaser.Physics.P2JS);
-      this.physics.p2.gravity.y = 400;
+      this.physics.p2.gravity.y = 500;
       this.physics.p2.friction = 0.5;
+      this.physics.p2.setImpactEvents(true);
 
       this.pinball = new PinballPhysics(this.game);
 
