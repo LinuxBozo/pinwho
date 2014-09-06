@@ -34,8 +34,8 @@
     };
 
     PinballPhysics.prototype.registerKeys = function() {
-      this.leftKey = this.game.input.keyboard.addKey(Phaser.Keyboard.Z);
-      this.rightKey = this.game.input.keyboard.addKey(Phaser.Keyboard.X);
+      this.leftKey = this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
+      this.rightKey = this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
       this.plungerKey = this.game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
       this.plungerKey.onUp.add(this.launchPlunger, this);
     };
@@ -84,7 +84,7 @@
 
       switch (type) {
         case 0 /* BALL_FLIPPER */:
-          contactMaterial.restitution = 0.9;
+          contactMaterial.restitution = 1.1;
           break;
         case 1 /* BALL_PLUNGER */:
           contactMaterial.restitution = 5;
@@ -117,7 +117,7 @@
     };
 
     PinballPhysics.prototype.createPlunger = function() {
-      var plungerAnchor = this.create(735, 750, null);
+      var plungerAnchor = this.create(735, 790, null);
       plungerAnchor.key = 'plungerAnchor';
       this.game.physics.p2.enableBody(plungerAnchor, true);
       plungerAnchor.body.clearShapes();
@@ -154,7 +154,7 @@
       this.game.physics.p2.enableBody(endOfTable, true);
       endOfTable.body.clearShapes();
       endOfTable.body.static = true;
-      endOfTable.body.setRectangle(this.game.world.width, 50);
+      endOfTable.body.setRectangle(this.game.world.width, 10);
       endOfTable.body.data.shapes[0].sensor = true;
       return endOfTable;
     };
