@@ -35,10 +35,12 @@
       this.bumperMaterial = this.game.physics.p2.createMaterial('bumperMaterial');
       this.flipperMaterial = this.game.physics.p2.createMaterial('flipperMaterial');
       this.slingMaterial = this.game.physics.p2.createMaterial('slingMaterial');
+      this.tableMaterial = this.game.physics.p2.createMaterial('tableMaterial');
 
       this.generateContactMaterial(this.ballMaterial, this.flipperMaterial, 0); // BALL_FLIPPER
       this.generateContactMaterial(this.ballMaterial, this.slingMaterial, 1); // BALL_SLINGSHOT
       this.generateContactMaterial(this.ballMaterial, this.bumperMaterial, 2); // BALL_BUMPER
+      this.generateContactMaterial(this.ballMaterial, this.tableMaterial, 3); // BALL_TABLE
     }
 
     PinballPhysics.prototype.registerKeys = function() {
@@ -84,7 +86,7 @@
       var contactMaterial = this.game.physics.p2.createContactMaterial(mat1, mat2);
       switch (type) {
         case 0 /* BALL_FLIPPER */:
-          contactMaterial.restitution = .5;
+          contactMaterial.restitution = .6;
           break;
         case 1 /* BALL_SLINGSHOT */:
           contactMaterial.restitution = 1.2;
@@ -92,6 +94,8 @@
         case 2 /* BALL_BUMPER */:
           contactMaterial.restitution = 1.4;
           break;
+        case 3 /* BALL_TABLE */:
+          contactMaterial.restitution = .5;
       }
       return contactMaterial;
     };
